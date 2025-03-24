@@ -1,0 +1,70 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/User/layout}">
+<head>
+    <title>Sản phẩm theo danh mục</title>
+</head>
+<body>
+<div layout:fragment="content" class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-8">Sản phẩm trong danh mục</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <a th:each="product : ${products}"
+           th:href="@{'/products/detail/' + ${product.productId}}"
+           class="block bg-white dark:bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden group">
+            <div class="relative overflow-hidden">
+                <img th:src="@{'/images/medicine/' + ${product.imageUrl}}"
+                     alt="Product Image"
+                     class="w-full h-56 object-cover transform group-hover:scale-105 transition duration-300">
+                <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                    <span class="bg-white text-purple-600 px-4 py-2 rounded-full font-semibold hover:bg-purple-600 hover:text-white transition duration-300 text-sm">Xem chi tiết</span>
+                </div>
+            </div>
+            <div class="p-6">
+                <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2" th:text="${product.productName}">Tên sản phẩm</h3>
+                <p class="text-gray-600 dark:text-gray-300 mb-2 text-sm" th:text="${'Thương hiệu: ' + product.supplier.supplierName}">Thương hiệu</p>
+                <p class="text-xl font-bold text-purple-600 dark:text-purple-400 mb-3" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT') + ' VNĐ'}">Giá</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex text-yellow-400">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" th:each="i : ${#numbers.sequence(1, 5)}">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                    </div>
+                    <span class="text-gray-600 dark:text-gray-300 text-sm" th:text="${'Tồn kho: ' + product.stockQuantity}">Tồn kho</span>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-8 flex justify-center">
+        <nav aria-label="Page navigation">
+            <ul class="flex list-style-none">
+                <li th:if="${currentPage > 0}" class="page-item">
+                    <a th:href="@{'/category/' + ${categoryId}(page=${currentPage - 1})}"
+                       class="page-link relative block py-1.5 px-3 rounded border-0 bg-transparent outline-none transition-all duration-300 rounded text-gray-800 hover:text-gray-800 hover:bg-gray-200 focus:shadow-none"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo; Trước</span>
+                    </a>
+                </li>
+                <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                    th:class="${pageNum == currentPage ? 'page-item active' : 'page-item'}">
+                    <a th:href="@{'/category/' + ${categoryId}(page=${pageNum})}"
+                       th:text="${pageNum + 1}"
+                       class="page-link relative block py-1.5 px-3 rounded border-0 bg-transparent outline-none transition-all duration-300 rounded text-gray-800 hover:text-gray-800 hover:bg-gray-200 focus:shadow-none"
+                       th:classappend="${pageNum == currentPage ? 'bg-blue-600  hover:text-white hover:bg-blue-700' : ''}">
+                    </a>
+                </li>
+                <li th:if="${currentPage < totalPages - 1}" class="page-item">
+                    <a th:href="@{'/category/' + ${categoryId}(page=${currentPage + 1})}"
+                       class="page-link relative block py-1.5 px-3 rounded border-0 bg-transparent outline-none transition-all duration-300 rounded text-gray-800 hover:text-gray-800 hover:bg-gray-200 focus:shadow-none"
+                       aria-label="Next">
+                        <span aria-hidden="true">Sau &raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/User/layout}">
+
+<section layout:fragment="content" class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Place Your Order</h1>
+    <div class="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+        <div class="grid md:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-lg font-semibold bg-gray-100 rounded-full px-4 py-2 mb-4">Thông Tin Nhận Hàng</h2>
+                <p class="text-sm text-gray-600 italic mb-6">Contact staff before transferring money to buy products</p>
+                <ul class="space-y-4">
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Tổng</span>
+                        <span class="font-medium" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 2, 'POINT')}"></span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Số Lượng</span>
+                        <span class="font-medium" th:text="${totalItems}"></span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Phí vận chuyển</span>
+                        <span class="font-medium">Miễn phí vận chuyển</span>
+                    </li>
+                    <li class="flex justify-between font-semibold">
+                        <span>Thành Tiền</span>
+                        <span th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 2, 'POINT')}"></span>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h2 class="text-lg font-semibold bg-gray-100 rounded-full px-4 py-2 mb-4">Chi tiết thanh toán</h2>
+                <form th:action="@{/cart/payment}" method="post" class="space-y-4">
+                    <input type="text" id="customerName" name="customerName" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Họ và tên" th:value="${userName}" required>
+                    <input type="text" id="phoneCustomer" name="phoneCustomer" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Số điện thoại" th:value="${userPhone}" required>
+                    <input type="text" id="addressCustomer" name="addressCustomer" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Địa chỉ" th:value="${userAddress}" required>
+                    <input type="email" id="emailCustomer" name="emailCustomer" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Email của bạn" th:value="${userEmail}" required>
+                    <input type="text" id="descriptionOrder" name="descriptionOrder" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Ghi chú cho cửa hàng" required>
+
+                    <div class="space-y-2">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" id="cod" name="paymentMethod" class="form-radio" value="cod">
+                            <span>Thanh toán khi nhận hàng (COD)</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" id="momo" name="paymentMethod" class="form-radio" value="momo">
+                            <span>Thanh toán qua MOMO</span>
+                        </label>
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" id="vnpay" name="paymentMethod" class="form-radio" value="vnpay">
+                            <span>Thanh toán qua VNPAY</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300" id="submitButton">Thanh Toán</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+</html>

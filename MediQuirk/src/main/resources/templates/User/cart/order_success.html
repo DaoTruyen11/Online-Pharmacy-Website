@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/User/layout}">
+
+<section layout:fragment="content" class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Đặt Hàng Thành Công</h1>
+    <div class="bg-white rounded-lg shadow-lg p-6 border border-gray-200">
+        <div class="grid md:grid-cols-2 gap-8">
+            <div>
+                <h2 class="text-lg font-semibold bg-gray-100 rounded-full px-4 py-2 mb-4">Thông Tin Đơn Hàng</h2>
+                <ul class="space-y-4">
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Mã Đơn Hàng</span>
+                        <span class="font-medium" th:text="${order.orderId}"></span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Ngày Đặt Hàng</span>
+                        <span class="font-medium" th:text="${#temporals.format(T(java.time.LocalDateTime).parse(order.orderDate), 'dd-MM-yyyy HH:mm')}"></span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Tổng Tiền</span>
+                        <span class="font-medium" th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 2, 'POINT')}"></span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Trạng Thái Đơn Hàng</span>
+                        <span class="font-medium" th:text="${order.orderStatus}"></span>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <h2 class="text-lg font-semibold bg-gray-100 rounded-full px-4 py-2 mb-4">Thông Tin Thanh Toán</h2>
+                <ul class="space-y-4" th:if="${payment != null}">
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Phương Thức Thanh Toán</span>
+                        <span class="font-medium" th:text="${payment.paymentMethod}"></span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Trạng Thái Thanh Toán</span>
+                        <span class="font-medium" th:text="${payment.paymentStatus}"></span>
+                    </li>
+                    <li class="flex justify-between border-b pb-2">
+                        <span class="text-gray-600">Mã Giao Dịch</span>
+                        <span class="font-medium" th:text="${payment.transactionId}"></span>
+                    </li>
+                </ul>
+                <p th:if="${payment == null}" class="text-gray-600 italic">Thông tin thanh toán không có sẵn</p>
+            </div>
+        </div>
+        <div class="mt-8">
+            <h2 class="text-lg font-semibold bg-gray-100 rounded-full px-4 py-2 mb-4">Thông Tin Giao Hàng</h2>
+            <ul class="space-y-4">
+                <li class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">Tên Khách Hàng</span>
+                    <span class="font-medium" th:text="${userName}"></span>
+                </li>
+                <li class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">Số Điện Thoại</span>
+                    <span class="font-medium" th:text="${userPhone}"></span>
+                </li>
+                <li class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">Địa Chỉ</span>
+                    <span class="font-medium" th:text="${userAddress}"></span>
+                </li>
+                <li class="flex justify-between border-b pb-2">
+                    <span class="text-gray-600">Email</span>
+                    <span class="font-medium" th:text="${userEmail}"></span>
+                </li>
+            </ul>
+        </div>
+        <div class="mt-8 text-center">
+            <a href="/" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">Tiếp Tục Mua Sắm</a>
+        </div>
+    </div>
+</section>
+
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/Admin/layout}">
+<body>
+<section layout:fragment="content" class="right-content mt-4 ms-3">
+    <div class="flex justify-between items-center mb-4 mx-auto">
+        <div class="flex space-x-2">
+            <p class="fs-3 text-primary">Supplier</p>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-3 px-3 mt-5">
+        <div class="flex items-center max-w-md">
+            <input type="text" id="searchInput" class="w-full px-4 py-2 rounded-l-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Search orders by ID...">
+            <button id="searchButton" class="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600 transition duration-300 ease-in-out">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+        <a th:href="@{/admin/suppliers/add}" class="btn btn-primary">Add New Supplier</a>
+    </div>
+
+    <div class="container">
+        <table class="table table-bordered  table-striped table-hover">
+            <thead class="head-dark">
+            <tr>
+                <th scope="col" class="text-center">ID</th>
+                <th scope="col">Supplier Name</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Email</th>
+                <th scope="col">Contact Name</th>
+                <th scope="col">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr th:each="supplier : ${suppliers}">
+                <td th:text="${supplier.supplierId}" class="text-center"></td>
+                <td th:text="${supplier.supplierName}"></td>
+                <td th:text="${supplier.phone}"></td>
+                <td th:text="${supplier.email}"></td>
+                <td th:text="${supplier.contactName}"></td>
+                <td class="text-center ">
+
+                    <a th:href="@{/admin/suppliers/edit/{id}(id=${supplier.supplierId})}"
+                       class="btn btn-outline-primary btn-sm mr-1">
+                        <i class="bi bi-pencil-square"></i> Chỉnh sửa
+                    </a>
+
+                    <a th:href="@{/admin/suppliers/delete/{id}(id=${supplier.supplierId})}"
+                       class="btn btn-outline-danger btn-sm"
+                       onclick="return confirm('Bạn có chắc muốn xóa nhà cung cấp này?');">
+                        <i class="bi bi-trash3"></i> Xóa
+                    </a>
+                </td>
+            </tr>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const searchInput = document.getElementById('searchInput');
+                    const searchButton = document.getElementById('searchButton');
+                    const table = document.querySelector('table');
+                    const rows = table.querySelectorAll('tbody tr');
+
+                    function performSearch() {
+                        const searchTerm = searchInput.value.toLowerCase();
+
+                        rows.forEach(row => {
+                            const orderId = row.querySelector('td:first-child').textContent.toLowerCase();
+                            if (orderId.includes(searchTerm)) {
+                                row.style.display = '';
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    searchButton.addEventListener('click', performSearch);
+
+                    searchInput.addEventListener('keyup', function(event) {
+                        if (event.key === 'Enter') {
+                            performSearch();
+                        }
+                    });
+                });
+            </script>
+            </tbody>
+        </table>
+    </div>
+
+</section>
+</body>
+</html>

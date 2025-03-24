@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security5"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head th:replace="~{Admin/fragments/head ::head}"></head>
+<body>
+
+<main>
+    <div th:replace="~{Admin/fragments/sidebar :: sidebar}"></div>
+
+    <section layout:fragment="content">
+    </section>
+</main>
+
+<!--<footer th:replace="Admin/fragments/footer ::footer"></footer>-->
+<script th:replace="~{Admin/fragments/script :: script}"></script>
+
+</body>
+</html>

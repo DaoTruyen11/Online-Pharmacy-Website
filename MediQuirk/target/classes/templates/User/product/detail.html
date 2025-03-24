@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/User/layout}">
+<head>
+    <title th:text="${product.productName}">Product Detail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+<div layout:fragment="content" class="container mx-auto px-4 py-12">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Product Image -->
+            <div class="md:w-1/4">
+                <img th:src="@{/images/medicine/} + ${product.imageUrl}" th:alt="${product.productName}" class="w-full h-auto rounded-lg shadow-md">
+            </div>
+
+            <!-- Product Details -->
+            <div class="md:w-3/4">
+                <h1 class="text-3xl font-bold mb-2" th:text="${product.productName}">Product Name</h1>
+                <h2 class="text-xl text-gray-600 italic mb-4" th:text="${product.category.categoryName}">Category Name</h2>
+                <div class="flex items-center mb-4">
+                    <div class="flex text-yellow-400">
+                        <i th:each="star : ${#numbers.sequence(1, 5)}"
+                           th:class="${star <= averageRating ? 'bi bi-star-fill' : (star <= averageRating + 0.5 ? 'bi bi-star-half' : 'bi bi-star')}"></i>
+                    </div>
+                    <span class="ml-2 text-gray-600" th:text="'(' + ${totalReviews} + ' reviews)'"></span>
+                </div>
+                <p class="text-gray-700 mb-4" th:text="${product.description}">Product description goes here.</p>
+                <div class="text-3xl font-bold mb-4" th:text="${product.price + ' Đồng'}">Price</div>
+
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-semibold">One time purchase</span>
+                        <span class="font-bold" th:text="${product.price +' Đồng'}">Price</span>
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-semibold">Subscribe and save</span>
+                        <span class="font-bold text-green-600" th:text="${(product.price * 0.9) + ' Đồng'}">Discounted Price</span>
+                    </div>
+                    <form th:action="@{/cart/add}" method="post">
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="font-semibold text-lg text-gray-700">Quantity</span>
+                            <div class="flex items-center border rounded-full bg-white shadow-sm">
+                                <button type="button" class="px-4 py-2 text-xl text-gray-600 hover:text-gray-800 transition" onclick="decrementQuantity()">-</button>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" class="w-16 text-center border-x text-xl focus:outline-none">
+                                <button type="button" class="px-4 py-2 text-xl text-gray-600 hover:text-gray-800 transition" onclick="incrementQuantity()">+</button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="productId" th:value="${product.productId}">
+                        <button type="submit" class="w-full bg-blue-600 text-white py-1 rounded-full text-lg font-semibold hover:bg-blue-700 transition duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                            <i class="fas fa-shopping-cart mr-2"></i>Add to cart
+                        </button>
+                    </form>
+                </div>
+
+                <p class="text-gray-600 text-sm flex items-center">
+                    <i class="fas fa-shield-alt mr-2 text-green-600"></i>
+                    90-Day money back guarantee
+                </p>
+                <p class="text-gray-600 text-sm flex items-center mt-2">
+                    <i class="fas fa-truck mr-2 text-blue-600"></i>
+                    Free shipping on orders over 50.000 Đồng
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Reviews Section -->
+    <div class="mt-16">
+        <h2 class="text-3xl font-bold mb-8 text-gray-800">Customer Reviews</h2>
+
+        <!-- Reviews list -->
+        <div class="space-y-8">
+            <div th:each="review : ${reviewPage.content}" class="bg-white rounded-lg shadow-md p-6 transition duration-300 hover:shadow-lg mb-4">
+                <div class="review-content">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="flex text-yellow-400">
+                                <i th:each="star : ${#numbers.sequence(1, 5)}"
+                                   th:class="${star <= review.rating ? 'bi bi-star-fill' : 'bi bi-star'}"></i>
+                            </div>
+                            <span class="ml-3 font-semibold text-gray-700" th:text="${review.user.username}">User</span>
+                        </div>
+                        <span class="text-sm text-gray-500" th:text="${#temporals.format(review.reviewDate, 'dd MMM yyyy')}">Date</span>
+                    </div>
+                    <p class="text-gray-700 mb-4 leading-relaxed" th:text="${review.comment}">Review comment</p>
+
+                    <!-- Edit and Delete buttons (only visible to the review author) -->
+                    <div th:if="${#authentication.name == review.user.username}" class="flex space-x-4">
+                        <button class="edit-review-btn text-blue-600 hover:text-blue-800 font-semibold transition">Edit</button>
+                        <form th:action="@{/products/review/delete/{id}(id=${review.reviewId})}" method="post" class="inline">
+                            <button type="submit" class="text-red-600 hover:text-red-800 font-semibold transition">Delete</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Edit Review Form (Initially hidden) -->
+                <div class="edit-review-form hidden">
+                    <form th:action="@{/products/review/edit/{id}(id=${review.reviewId})}" method="post" class="space-y-4">
+                        <div>
+                            <label for="editRating" class="block text-sm font-medium text-gray-700">Rating</label>
+                            <div class="flex items-center">
+                                <div class="rating-container">
+                                    <input type="hidden" id="editRating" name="rating" class="rating-input" th:value="${review.rating}" />
+                                    <div class="flex text-3xl cursor-pointer text-yellow-400">
+                                        <span class="star bi bi-star" data-value="1"></span>
+                                        <span class="star bi bi-star" data-value="2"></span>
+                                        <span class="star bi bi-star" data-value="3"></span>
+                                        <span class="star bi bi-star" data-value="4"></span>
+                                        <span class="star bi bi-star" data-value="5"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="editComment" class="block text-sm font-medium text-gray-700">Your Review</label>
+                            <textarea id="editComment" name="comment" rows="4" th:text="${review.comment}"
+                                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"></textarea>
+                        </div>
+                        <div class="flex space-x-4">
+                            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300">
+                                Update Review
+                            </button>
+                            <button type="button" class="cancel-edit-btn bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition duration-300">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Form -->
+        <div class="mt-12 bg-white rounded-lg shadow-lg p-8">
+            <h3 class="text-3xl font-bold mb-6 text-gray-800">Write a Review</h3>
+            <form th:action="@{/products/review/add}" method="post" th:object="${productReview}" class="space-y-6">
+                <div>
+                    <label for="rating" class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                    <div class="flex items-center">
+                        <div class="rating-container">
+                            <input type="hidden" id="rating" name="rating" class="rating-input" th:field="*{rating}" />
+                            <div class="flex text-3xl cursor-pointer text-yellow-400">
+                                <span class="star bi bi-star" data-value="1"></span>
+                                <span class="star bi bi-star" data-value="2"></span>
+                                <span class="star bi bi-star" data-value="3"></span>
+                                <span class="star bi bi-star" data-value="4"></span>
+                                <span class="star bi bi-star" data-value="5"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+                    <textarea id="comment" th:field="*{comment}" rows="4"
+                              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm
+                                     focus:border-blue-500 focus:ring focus:ring-blue-200
+                                     focus:ring-opacity-50 transition duration-150"
+                              placeholder="Share your thoughts about this product..."></textarea>
+                </div>
+                <input type="hidden" name="productId" th:value="${product.productId}">
+                <button type="submit"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4
+                               rounded-lg transition duration-300 transform hover:scale-105
+                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    Submit Review
+                </button>
+            </form>
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-8 flex justify-center">
+            <nav aria-label="Page navigation" th:if="${reviewPage.totalPages > 1}">
+                <ul class="flex list-style-none space-x-2">
+                    <li th:class="${reviewPage.first ? 'disabled' : ''}">
+                        <a th:href="@{'/products/detail/' + ${product.productId}(page=${reviewPage.number - 1})}"
+                           class="page-link relative block py-2 px-4 rounded-full border border-gray-300 bg-white text-blue-600 hover:bg-gray-100 transition duration-300"
+                           th:classappend="${reviewPage.first ? 'pointer-events-none opacity-50' : ''}">Previous</a>
+                    </li>
+                    <li th:each="pageNumber : ${#numbers.sequence(0, reviewPage.totalPages - 1)}"
+                        th:class="${pageNumber == reviewPage.number ? 'active' : ''}">
+                        <a th:href="@{'/products/detail/' + ${product.productId}(page=${pageNumber})}"
+                           th:text="${pageNumber + 1}"
+                           class="page-link relative block py-2 px-4 rounded-full border border-gray-300 bg-white text-blue-600 hover:bg-gray-100 transition duration-300"
+                           th:classappend="${pageNumber == reviewPage.number ? 'bg-blue-600 text-white border-blue-600' : ''}"></a>
+                    </li>
+                    <li th:class="${reviewPage.last ? 'disabled' : ''}">
+                        <a th:href="@{'/products/detail/' + ${product.productId}(page=${reviewPage.number + 1})}"
+                           class="page-link relative block py-2 px-4 rounded-full border border-gray-300 bg-white text-blue-600 hover:bg-gray-100 transition duration-300"
+                           th:classappend="${reviewPage.last ? 'pointer-events-none opacity-50' : ''}">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

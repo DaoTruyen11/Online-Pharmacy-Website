@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/User/layout}">
+
+
+<body class="bg-gray-50">
+<section layout:fragment="content" class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Your Shopping Cart</h1>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <div class="lg:w-2/3">
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <table class="w-full">
+                    <thead>
+                    <tr class="bg-gray-100">
+                        <th class="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                        <th class="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                        <th class="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                        <th class="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                        <th class="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                    <tr th:each="item : ${cartItems}" class="hover:bg-gray-50">
+                        <td class="p-4 flex items-center space-x-3">
+                            <img th:src="@{/images/medicine/} + ${item.product.imageUrl}" class="w-16 h-16 object-cover rounded-md" alt="Product Image">
+                            <div>
+                                <h5 class="font-semibold text-gray-800" th:text="${item.product.productName}"></h5>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center space-x-2">
+                                <form th:action="@{/cart/decrease}" method="post" class="inline">
+                                    <input type="hidden" name="productId" th:value="${item.product.productId}"/>
+                                    <button type="submit" class="bg-gray-200 text-gray-600 hover:bg-gray-300 p-1 rounded">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                                    </button>
+                                </form>
+                                <span th:text="${item.quantity}" class="font-medium text-gray-700"></span>
+                                <form th:action="@{/cart/increase}" method="post" class="inline">
+                                    <input type="hidden" name="productId" th:value="${item.product.productId}"/>
+                                    <button type="submit" class="bg-gray-200 text-gray-600 hover:bg-gray-300 p-1 rounded">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                        <td class="p-4 text-gray-700" th:text="${#numbers.formatDecimal(item.product.price, 0, 'COMMA', 2, 'POINT')}"></td>
+                        <td class="p-4 font-medium text-gray-900" th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 'COMMA', 2, 'POINT')}"></td>
+                        <td class="p-4">
+                            <form th:action="@{/cart/remove/{productId}(productId=${item.product.productId})}" method="post">
+                                <button type="submit" class="text-red-500 hover:text-red-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="lg:w-1/3">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h5 class="font-bold text-xl mb-4 text-gray-800">Cart Summary</h5>
+                <div class="space-y-2 mb-4">
+                    <p class="flex justify-between"><span class="text-gray-600">Total items:</span> <span class="font-medium text-gray-800" th:text="${totalItems}"></span></p>
+                    <p class="flex justify-between"><span class="text-gray-600">Total price:</span> <span class="font-medium text-gray-800" th:text="${#numbers.formatDecimal(totalPrice, 0, 'COMMA', 2, 'POINT')}"></span></p>
+                </div>
+                <hr class="my-4">
+                <form th:action="@{/cart/checkout}" method="post" class="mb-3">
+                    <button type="submit" class="w-full bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary-dark transition duration-300 ease-in-out">Checkout</button>
+                </form>
+                <form th:action="@{/cart/clear}" method="post">
+                    <button type="submit" class="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 transition duration-300 ease-in-out">Clear Cart</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

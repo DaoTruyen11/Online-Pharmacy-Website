@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/Admin/layout}">
+<head>
+    <style>
+        .table-container {
+            height: 65vh; /* Increased height */
+            overflow-y: auto;
+        }
+        .truncate {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        th {
+            position: sticky;
+            top: 0;
+            background-color: #f3f4f6;
+            z-index: 10;
+        }
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<section layout:fragment="content" class="max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white shadow-md rounded-lg overflow-hidden h-[80vh]"> <!-- Increased overall height -->
+        <div class="p-6 flex flex-col h-full"> <!-- Made this a flex container -->
+            <div class="flex flex-col items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">Category Management</h1>
+                <div class="w-full flex justify-between items-center">
+                    <div class="flex items-center max-w-md">
+                        <input type="text" id="searchInput" class="w-full px-4 py-2 rounded-l-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Search categories...">
+                        <button id="searchButton" class="bg-blue-500 text-white px-4 py-2 rounded-r-md hover:bg-blue-600 transition duration-300 ease-in-out">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                    <a th:href="@{/admin/categories/add}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-md transition duration-300 ease-in-out">
+                        <i class="bi bi-plus-circle mr-2"></i>Add New Category
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-container flex-grow"> <!-- Made this grow to fill available space -->
+                <div class="overflow-x-auto h-full"> <!-- Set to full height -->
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                        <tr class="bg-gray-50">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="category : ${categories}" class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${category.categoryId}"></td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 truncate max-w-xs" th:text="${category.categoryName}"></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-500 truncate max-w-xs"
+                                     th:title="${category.categoryDescription}"
+                                     th:text="${#strings.length(category.categoryDescription) > 50 ? #strings.substring(category.categoryDescription,0,50) + '...' : category.categoryDescription}">
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <a th:href="@{/admin/categories/edit/{id}(id=${category.categoryId})}" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <a th:href="@{/admin/categories/delete/{id}(id=${category.categoryId})}" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to delete this category?');">
+                                    <i class="bi bi-trash3"></i> Delete
+                                </a>
+                            </td>
+                        </tr>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const searchInput = document.getElementById('searchInput');
+                                const searchButton = document.getElementById('searchButton');
+                                const table = document.querySelector('table');
+                                const rows = table.querySelectorAll('tbody tr');
+
+                                function performSearch() {
+                                    const searchTerm = searchInput.value.toLowerCase();
+
+                                    rows.forEach(row => {
+                                        const categoryName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                                        if (categoryName.includes(searchTerm)) {
+                                            row.style.display = '';
+                                        } else {
+                                            row.style.display = 'none';
+                                        }
+                                    });
+                                }
+
+                                searchButton.addEventListener('click', performSearch);
+
+                                searchInput.addEventListener('keyup', function(event) {
+                                    if (event.key === 'Enter') {
+                                        performSearch();
+                                    }
+                                });
+                            });
+                        </script>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

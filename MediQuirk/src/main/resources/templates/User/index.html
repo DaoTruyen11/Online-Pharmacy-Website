@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/User/layout}">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300" x-data="{ darkMode: false }" :class="{ 'dark': darkMode }">
+<section layout:fragment="content">
+    <section class="relative bg-gradient-to-r from-purple-600 to-indigo-700 dark:from-purple-900 dark:to-indigo-900 py-16 sm:py-24">
+        <div class="absolute inset-0 bg-pattern opacity-10"></div>
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="flex flex-col lg:flex-row items-center justify-between">
+                <div class="w-full lg:w-1/2 text-white mb-8 lg:mb-0">
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-4 animate-fade-in-up">
+                        Khỏe Mạnh <span class="text-yellow-300">Vô Lo.</span>
+                    </h1>
+                    <p class="mt-3 text-lg sm:text-xl text-purple-100 animate-fade-in-up animation-delay-300 max-w-lg">
+                        Sản phẩm thân thiện - Nguồn góc rõ ràng - Nâng cao sức khỏe - Vui sống trọn đời!
+                        MediQuirk - Đồng hành cùng bạn trên hành trình khỏe mạnh!
+                    </p>
+                    <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 animate-fade-in-up animation-delay-600">
+                        <a href="#products" class="bg-white text-purple-700 hover:bg-purple-100 px-6 py-2 rounded-full font-semibold transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md text-center text-sm sm:text-base">
+                            Xem sản phẩm
+                        </a>
+                        <a href="#" class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-purple-700 px-6 py-2 rounded-full font-semibold transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md text-center text-sm sm:text-base">
+                            Tìm hiểu thêm
+                        </a>
+                    </div>
+                </div>
+                <div class="w-full lg:w-1/2 flex justify-center">
+                    <img src="https://cdn.nhathuoclongchau.com.vn/unsafe/768x0/filters:quality(90)/https://cms-prod.s3-sgn09.fptcloud.com/DSC_03594_d9d39b4d3f.jpg" alt="Product Image" class="rounded-full shadow-xl hover:shadow-2xl transition duration-300 transform hover:scale-105 animate-float w-3/4 lg:w-5/6">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Medicines Section -->
+    <div class="bg-white dark:bg-gray-800 py-16 sm:py-20">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl sm:text-4xl font-bold text-center text-gray-800 dark:text-white mb-10 sm:mb-12">Phổ biến theo từng loại</h2>
+            <div class="flex flex-wrap justify-center gap-3 mb-10 sm:mb-12">
+                <a href="#" class="bg-purple-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-purple-700 transition duration-300 text-sm">Tất cả</a>
+                <a href="#" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition duration-300 text-sm">Thuốc</a>
+                <a href="#" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition duration-300 text-sm">Thực phẩm chức năng</a>
+                <a href="#" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition duration-300 text-sm">Chăm sóc cá nhân</a>
+                <a href="#" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-full font-semibold hover:bg-gray-300 transition duration-300 text-sm">Chăm sóc sắc đẹp</a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a th:href="@{'/products/detail/' + ${product.productId}}" class="block bg-white dark:bg-gray-700 rounded-xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden group" th:each="product : ${products}">
+                    <div class="relative overflow-hidden">
+                        <img th:src="@{/images/medicine/} + ${product.imageUrl}" alt="Product Image" class="w-full h-56 object-cover transform group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                            <span class="bg-white text-purple-600 px-4 py-2 rounded-full font-semibold hover:bg-purple-600 hover:text-white transition duration-300 text-sm">Xem chi tiết</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-2" th:text="${product.productName}">Sữa bột Ensure</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-2 text-sm" th:text="${'Thương hiệu: ' + product.supplier.supplierName}">Thương hiệu: Abbott</p>
+                        <p class="text-xl font-bold text-purple-600 dark:text-purple-400 mb-3" th:text="${'$' + product.price}">$9.99</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex text-yellow-400">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" th:each="i : ${#numbers.sequence(1, 5)}">
+                                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                                </svg>
+                            </div>
+                            <span class="text-gray-600 dark:text-gray-300 text-sm" th:text="${'Tồn kho: ' + product.stockQuantity}">Tồn kho: 999</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-8 flex justify-center">
+                <nav aria-label="Page navigation">
+                    <ul class="inline-flex items-center -space-x-px">
+                        <li>
+                            <a th:if="${currentPage > 0}"
+                               th:href="@{/(page=${currentPage - 1}, size=${size})}"
+                               class="block px-3 py-2 ml-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                                <span class="sr-only">Previous</span>
+                                <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            </a>
+                        </li>
+                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                            <a th:href="@{/(page=${i}, size=${size})}"
+                               th:text="${i + 1}"
+                               th:class="${i == currentPage ? 'z-10 px-3 py-2 leading-tight text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white' : 'px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'}">
+                            </a>
+                        </li>
+                        <li>
+                            <a th:if="${currentPage < totalPages - 1}"
+                               th:href="@{/(page=${currentPage + 1}, size=${size})}"
+                               class="block px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                                <span class="sr-only">Next</span>
+                                <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Why Choose Us Section -->
+    <div class="bg-gray-100 dark:bg-gray-800 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-12">Tại sao chọn MediQuirk?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white dark:bg-gray-700 p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                    <svg class="w-16 h-16 text-purple-600 mb-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-4 text-center">Chất lượng đảm bảo</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-center">Chúng tôi cam kết cung cấp sản phẩm chất lượng cao nhất cho khách hàng.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-700 p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                    <svg class="w-16 h-16 text-purple-600 mb-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                    <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-4 text-center">Giá cả cạnh tranh</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-center">Chúng tôi cung cấp giá cả hợp lý mà không ảnh hưởng đến chất lượng.</p>
+                </div>
+                <div class="bg-white dark:bg-gray-700 p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                    <svg class="w-16 h-16 text-purple-600 mb-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h3 class="text-2xl font-semibold text-gray-800 dark:text-white mb-4 text-center">Giao hàng nhanh chóng</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-center">Chúng tôi đảm bảo giao hàng nhanh chóng và an toàn đến tận tay khách hàng.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediQuirk - Product Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .table-responsive {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        #imagePreview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+        <a class="navbar-brand" href="#">MediQuirk - Product Management</a>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Search products...">
+        </div>
+        <div class="col-md-3">
+            <button onclick="searchProducts()" class="btn btn-primary w-100">Search</button>
+        </div>
+        <div class="col-md-3">
+            <button onclick="loadAllProducts()" class="btn btn-secondary w-100">Load All Products</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Product List</h5>
+                    <button onclick="loadProducts()" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div class="card-body table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Prescription</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="productList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Add/Edit Product</h5>
+                </div>
+                <div class="card-body">
+                    <form id="productForm">
+                        <input type="hidden" id="productId">
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Name:</label>
+                            <input type="text" class="form-control" id="productName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price:</label>
+                            <input type="number" class="form-control" id="price" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description:</label>
+                            <textarea class="form-control" id="description" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category:</label>
+                            <select id="category" class="form-select">
+                                <option value="">Select Category</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="supplier" class="form-label">Supplier:</label>
+                            <select id="supplier" class="form-select">
+                                <option value="">Select Supplier</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="stockQuantity" class="form-label">Stock Quantity:</label>
+                            <input type="number" class="form-control" id="stockQuantity">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="prescriptionRequired">
+                            <label class="form-check-label" for="prescriptionRequired">Prescription Required</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="imageUpload" class="form-label">Product Image:</label>
+                            <input type="file" class="form-control" id="imageUpload" accept="image/*">
+                            <img id="imagePreview" src="" alt="Product Image Preview" style="display:none;">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Save Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        loadProducts();
+        fetchCategories();
+        fetchSuppliers();
+        $("#productForm").on('submit', function(e) {
+            e.preventDefault();
+            saveProduct();
+        });
+
+        $("#imageUpload").change(function() {
+            readURL(this);
+        });
+    });
+
+    function loadProducts() {
+        $.ajax({
+            url: '/api/products',
+            type: 'GET',
+            success: function(products) {
+                displayProducts(products);
+            }
+        });
+    }
+
+    function loadAllProducts() {
+        $.ajax({
+            url: '/api/products/all',
+            type: 'GET',
+            success: function(products) {
+                displayProducts(products);
+            }
+        });
+    }
+
+    function displayProducts(products) {
+        let productList = '';
+        $.each(products, function(index, product) {
+            productList += `<tr>
+                <td>${product.productId}</td>
+                <td>${product.productName}</td>
+                <td>$${product.price.toFixed(2)}</td>
+                <td>${product.stockQuantity}</td>
+                <td>${product.prescriptionRequired ? '<span class="badge bg-warning">Required</span>' : '<span class="badge bg-success">Not Required</span>'}</td>
+                <td>
+                    <button onclick="editProduct(${product.productId})" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
+                    <button onclick="deleteProduct(${product.productId})" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`;
+        });
+        $('#productList').html(productList);
+    }
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                $('#imagePreview').attr('src', e.target.result);
+                $('#imagePreview').show();
+            }
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function saveProduct() {
+        var formData = new FormData();
+        formData.append('productId', $('#productId').val());
+        formData.append('productName', $('#productName').val());
+        formData.append('price', $('#price').val());
+        formData.append('description', $('#description').val());
+        formData.append('categoryId', $('#category').val());
+        formData.append('supplierId', $('#supplier').val());
+        formData.append('stockQuantity', $('#stockQuantity').val());
+        formData.append('prescriptionRequired', $('#prescriptionRequired').is(':checked'));
+
+        var imageFile = $('#imageUpload')[0].files[0];
+        if (imageFile) {
+            formData.append('image', imageFile);
+        }
+
+        const apiUrl = $('#productId').val() ? `/api/products/${$('#productId').val()}` : '/api/products';
+        const apiType = $('#productId').val() ? 'PUT' : 'POST';
+
+        $.ajax({
+            url: apiUrl,
+            type: apiType,
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function() {
+                resetForm();
+                loadProducts();
+                showAlert('Product saved successfully!', 'success');
+            },
+            error: function() {
+                showAlert('Error saving product. Please try again.', 'danger');
+            }
+        });
+    }
+
+    function editProduct(id) {
+        $.ajax({
+            url: `/api/products/${id}`,
+            type: 'GET',
+            success: function(product) {
+                $('#productId').val(product.productId);
+                $('#productName').val(product.productName);
+                $('#price').val(product.price);
+                $('#description').val(product.description);
+                $('#category').val(product.category ? product.category.categoryId : '');
+                $('#supplier').val(product.supplier ? product.supplier.supplierId : '');
+                $('#stockQuantity').val(product.stockQuantity);
+                $('#prescriptionRequired').prop('checked', product.prescriptionRequired);
+                if (product.imageUrl) {
+                    $('#imagePreview').attr('src', product.imageUrl);
+                    $('#imagePreview').show();
+                } else {
+                    $('#imagePreview').hide();
+                }
+            }
+        });
+    }
+
+    function deleteProduct(id) {
+        if (confirm('Are you sure you want to delete this product?')) {
+            $.ajax({
+                url: `/api/products/${id}`,
+                type: 'DELETE',
+                success: function() {
+                    loadProducts();
+                    showAlert('Product deleted successfully!', 'success');
+                },
+                error: function() {
+                    showAlert('Error deleting product. Please try again.', 'danger');
+                }
+            });
+        }
+    }
+
+    function resetForm() {
+        $('#productId').val('');
+        $('#productForm')[0].reset();
+        $('#imagePreview').attr('src', '').hide();
+    }
+
+    function fetchCategories() {
+        $.ajax({
+            url: '/api/categories',
+            type: 'GET',
+            success: function(categories) {
+                let categoryOptions = '<option value="">Select Category</option>';
+                $.each(categories, function(index, category) {
+                    categoryOptions += `<option value="${category.categoryId}">${category.categoryName}</option>`;
+                });
+                $('#category').html(categoryOptions);
+            }
+        });
+    }
+
+    function fetchSuppliers() {
+        $.ajax({
+            url: '/api/suppliers',
+            type: 'GET',
+            success: function(suppliers) {
+                let supplierOptions = '<option value="">Select Supplier</option>';
+                $.each(suppliers, function(index, supplier) {
+                    supplierOptions += `<option value="${supplier.supplierId}">${supplier.supplierName}</option>`;
+                });
+                $('#supplier').html(supplierOptions);
+            }
+        });
+    }
+
+    function searchProducts() {
+        const searchTerm = $('#searchInput').val();
+        $.ajax({
+            url: `/api/products/search?term=${searchTerm}`,
+            type: 'GET',
+            success: function(products) {
+                displayProducts(products);
+            }
+        });
+    }
+
+    function showAlert(message, type) {
+        const alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        $('.container').prepend(alertHtml);
+        setTimeout(() => {
+            $('.alert').alert('close');
+        }, 3000);
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
